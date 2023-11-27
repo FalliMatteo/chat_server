@@ -54,7 +54,7 @@ public class ServerThread extends Thread{
     public boolean sendBroadcast(String message) throws IOException{
         boolean kek = false;
         for(int i=0; i<App.peopleInChat.size(); i++){
-            if(!this.username.equals(App.peopleInChat.get(i).getUsername()) || !App.peopleInChat.get(i).getUsername().equals("")){
+            if(!this.username.equals(App.peopleInChat.get(i).getUsername()) && !App.peopleInChat.get(i).getUsername().isEmpty()){
                 App.peopleInChat.get(i).sendMessage(message);;
                 kek = true;
             }
