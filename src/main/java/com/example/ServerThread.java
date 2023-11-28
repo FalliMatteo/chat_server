@@ -1,6 +1,7 @@
 package com.example;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
@@ -9,14 +10,14 @@ public class ServerThread extends Thread{
     private Socket socket;
     public String username;
     private BufferedReader input;
-    private Sender sender;
+    private DataOutputStream output;
 
     public ServerThread(Socket socket) {
         this.socket = socket;
         this.username = "";
-        this.sender = new Sender(this.socket);
         try{
-            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            this.output = new DataOutputStream(this.socket.getOutputStream());
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
@@ -30,8 +31,8 @@ public class ServerThread extends Thread{
         return this.socket;
     }
 
-    public synchronized void sendMessage(String message){
-        sender.addMessage(message);
+    public synchronized void sendMessage(String message) throws IOException{
+        output.writeBytes(message + "\n");
     }
 
     public boolean setUsername(String string) throws IOException{
@@ -72,7 +73,7 @@ public class ServerThread extends Thread{
         }
     }
 
-    public void sendList(){
+    public void sendList() throws IOException{
         String users = "";
         for(int i=0; i<App.peopleInChat.size(); i++){
             if(!App.peopleInChat.get(i).getUsername().isEmpty()){
@@ -87,7 +88,7 @@ public class ServerThread extends Thread{
         sendMessage(users);
     }
 
-    public void sendCommands(){
+    public void sendCommands() throws IOException{
         String commands = "Here are all commands:   @list = to see all the users that are online,   @everyone / ... = to send a message to every user online,   @exit = to close the connection,   @username / ... = to change your username,   USERNAME / ... = to send a message to a single user";
         sendMessage(commands);
     }
@@ -95,7 +96,6 @@ public class ServerThread extends Thread{
     @Override
     public void run(){
         try {
-            sender.start();
             String incoming;
             String message[];
             boolean exit = false;
@@ -169,7 +169,6 @@ public class ServerThread extends Thread{
                 }
             }
             App.peopleInChat.remove(this);
-            sender.close();
         } catch (Exception e) {
             App.peopleInChat.remove(this);
             System.out.println(e.getMessage());
