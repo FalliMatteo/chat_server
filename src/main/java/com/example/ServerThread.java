@@ -10,13 +10,11 @@ public class ServerThread extends Thread{
     public String username;
     private BufferedReader input;
     private Sender sender;
-    public Semaforo semaforo;
 
     public ServerThread(Socket socket) {
         this.socket = socket;
         this.username = "";
         this.sender = new Sender(this.socket);
-        this.semaforo = new Semaforo();
         try{
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         }catch(Exception e){
@@ -32,10 +30,8 @@ public class ServerThread extends Thread{
         return this.socket;
     }
 
-    public void sendMessage(String message){
-        semaforo.p();
+    public synchronized void sendMessage(String message){
         sender.addMessage(message);
-        semaforo.v();
     }
 
     public boolean setUsername(String string) throws IOException{
