@@ -145,7 +145,7 @@ public class ServerThread extends Thread{
                         System.out.println(this.username + " wants to close the connection");
                         if(message.length == 1){
                             exit = true;
-                            sendBroadcast("L'utente " + this.username + " left the chat");
+                            sendBroadcast(this.username + " left the chat");
                         }else{
                             sendMessage("This is not the correct wording of the command");
                         }
